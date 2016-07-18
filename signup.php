@@ -3,6 +3,7 @@ if(!isset($_SESSION)){
     session_start();
 }
 include_once("z_db.php");
+include_once("utils.php");
 //session_start();
 
 
@@ -80,13 +81,27 @@ $msg=$msg."E-Mail Id Already Registered.<BR>";
 $status= "NOTOK";
 }				
 
-$result = mysqli_query($con,"SELECT count(*) FROM  affiliateuser where username = '$ref'");
-$row = mysqli_fetch_row($result);
-$numrows = $row[0];
-if ($numrows==0)
-{
-$msg=$msg."Sponsor/Referral Username Not Found..<BR>";
-$status= "NOTOK";
+$h_number = get_h($ref);
+$ref_id = get_id($ref);
+if($h_number != NULL && $ref_id != NULL) {
+    $refq = "SELECT COUNT(*),".$h_number."_active,".$h_number."_left,".$h_number."_right,username FROM  affiliateuser where Id = '$ref_id'";
+    $result = mysqli_query($con,$refq);
+    $row = mysqli_fetch_row($result);
+    if($row[0] == 0) {
+        $msg=$msg."Sponsor/Referral Username Not Found..<BR>";
+        $status= "NOTOK";
+    }
+    if($row[1] == 0) {
+        $msg=$msg."The sponsor/referral point is inactive..<BR>";
+        $status= "NOTOK";
+    }
+    if($row[2] != 'none' && $row[3] != 'none') {
+        $msg=$msg."The sponsor/referral point has no free slots..<BR>";
+        $status= "NOTOK";
+    }
+    $refusername = $row[4];
+} else {
+    $status = "NOTOK";
 }
 
 if ( $package=="" ){
@@ -161,7 +176,7 @@ $sbonus=0;
 if ($status=="OK") 
 {
 $scode=rand(1111111111,9999999999); //generating random code, this will act as signup key
-$query=mysqli_query($con,"insert into affiliateuser(username,password,fname,address,email,referedby,ipaddress,mobile,doj,country,signupcode,tamount,pcktaken,expiry) values('$username','$password','$name','$address','$email','$ref','$ip','$mobile','$cur','$country','$scode','$sbonus','$package','$expiry')");
+$query=mysqli_query($con,"insert into affiliateuser(username,password,fname,address,email,referedby,ipaddress,mobile,doj,country,signupcode,tamount,pcktaken,expiry) values('$username','$password','$name','$address','$email','$refusername','$ip','$mobile','$cur','$country','$scode','$sbonus','$package','$expiry')");
 $_SESSION['paypalidsession'] = $userid;
 // More headers
 $headers = "MIME-Version: 1.0" . "\r\n";

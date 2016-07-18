@@ -328,7 +328,7 @@ elseif(mysqli_real_escape_string($con,$_GET['method']) == "SOLIDTRUSTPAY") {
 	
 //$sci_pwd = $paymentProcessors['STPButtonPWD'];
 
-<?php $query="SELECT solidbutton FROM  settings where sno=0"; 
+$query="SELECT solidbutton FROM  settings where sno=0"; 
  
  
  $result = mysqli_query($con,$query);
@@ -337,7 +337,7 @@ while($row = mysqli_fetch_array($result))
 {
 	$sci_pwd="$row[solidbutton]";
 	}
-  ?>
+
 $sci_pwd = md5($sci_pwd.'s+E_a*');
 $hash_received = MD5($_POST['tr_id'] . ":" . MD5($sci_pwd) . ":" . $_POST['amount'] . ":" . $_POST['merchantAccount'] . ":" . $_POST['payerAccount']);
 
