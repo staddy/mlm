@@ -189,7 +189,7 @@ $message=$emailtext;
 mail($to,$subject,$message,$headers);
 print "
 				<script language='javascript'>
-					window.location = 'thankyou.php?username=$username';
+					window.location = 'thankyou_test.php?username=$username';
 				</script>
 			"; 
 
