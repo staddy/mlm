@@ -1,6 +1,7 @@
 <?php
 header( "refresh:3;url=profile.php" );
 include_once("z_db.php");// database connection details stored here
+
 // Inialize session
 session_start();
 // Check, if username session is NOT set then this page will jump to login page
@@ -82,8 +83,8 @@ $status= "NOTOK";}
 
 if ($status=="OK") 
 {
-
-$query=mysqli_query($con,"update affiliateuser set password='$p1',fname='$name',email='$emaill',country='$cntry',address='$addrs',bankname='$bankname',accountname='$accname',accountno='$accno',accounttype='$acctype',ifsccode='$ifsccode' where username='".$_SESSION['adminidusername']."'");
+$hash = password_hash($p1, PASSWORD_BCRYPT);
+$query=mysqli_query($con,"update affiliateuser set password='$hash',fname='$name',email='$emaill',country='$cntry',address='$addrs',bankname='$bankname',accountname='$accname',accountno='$accno',accounttype='$acctype',ifsccode='$ifsccode' where username='".$_SESSION['adminidusername']."'");
 
 
 print "updated....!!! Redirecting...";

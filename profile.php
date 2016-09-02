@@ -1,5 +1,6 @@
 <?php
 include_once ("z_db.php");
+
 // Inialize session
 session_start();
 // Check, if username session is NOT set then this page will jump to login page
@@ -67,8 +68,8 @@ $status= "NOTOK";}
 
 if ($status=="OK") 
 {
-
-$query=mysqli_query($con,"update affiliateuser set password='$p1',fname='$name',address='$address',country='$cont',bankname='$bankname',accountname='$accname',accountno='$accno',accounttype='$acctype',ifsccode='$ifsccode',email='$email',getpayment='$alwdpayment' where username='".$_SESSION['username']."'");
+$hash = password_hash($p1, PASSWORD_BCRYPT);
+$query=mysqli_query($con,"update affiliateuser set password='$hash',fname='$name',address='$address',country='$cont',bankname='$bankname',accountname='$accname',accountno='$accno',accounttype='$acctype',ifsccode='$ifsccode',email='$email',getpayment='$alwdpayment' where username='".$_SESSION['username']."'");
 
 
 $errormsg= "

@@ -1,6 +1,7 @@
 <?php
 //collecting data
 include_once ("z_db.php");
+
 $email=mysqli_real_escape_string($con,$_POST['femail']);
 $status=1;
 if($status==1){

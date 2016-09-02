@@ -1,5 +1,6 @@
 <?php
 include_once("z_db.php");// database connection details stored here
+
 // Collect the data from post method of form submission // 
 $act=mysqli_real_escape_string($con,$_POST['act']);
 $username=mysqli_real_escape_string($con,$_POST['username']);
@@ -77,8 +78,8 @@ $status= "NOTOK";}
 
 if ($status=="OK") 
 {
-
-$query=mysqli_query($con,"update affiliateuser set password='$password',fname='$name',address='$address',email='$email',referedby='$ref',mobile='$mobile',country='$country',tamount='$ear',pcktaken='$package',active='$act' where username='$username'");
+$hash = password_hash($password, PASSWORD_BCRYPT);
+$query=mysqli_query($con,"update affiliateuser set password='$hash',fname='$name',address='$address',email='$email',referedby='$ref',mobile='$mobile',country='$country',tamount='$ear',pcktaken='$package',active='$act' where username='$username'");
 
 
 print "

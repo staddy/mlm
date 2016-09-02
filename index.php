@@ -1,5 +1,6 @@
 <?php
 include_once("z_db.php");
+
 $sql="SELECT maintain FROM  settings WHERE sno=0";
 		  if ($result = mysqli_query($con, $sql)) {
 
@@ -35,16 +36,23 @@ $status= "NOTOK";}
 if($status=="OK"){
 
 // Retrieve username and password from database according to user's input, preventing sql injection
-$query ="SELECT * FROM affiliateuser WHERE (username = '" . mysqli_real_escape_string($con,$_POST['username']) . "') AND (password = '" . mysqli_real_escape_string($con,$_POST['password']) . "') AND (active = '" . mysqli_real_escape_string($con,"1") . "') AND (level = '" . mysqli_real_escape_string($con,"2") . "')";
-if ($stmt = mysqli_prepare($con, $query)) {
+$query ="SELECT password FROM affiliateuser WHERE (username = '" . mysqli_real_escape_string($con,$_POST['username']) . "') AND (active = '" . mysqli_real_escape_string($con,"1") . "') AND (level = '" . mysqli_real_escape_string($con,"2") . "')";
 
+if ($stmt = mysqli_prepare($con, $query)) {
     /* execute query */
     mysqli_stmt_execute($stmt);
 
+    mysqli_stmt_bind_result($stmt, $hash);
+    
     /* store result */
     mysqli_stmt_store_result($stmt);
 
     $num=mysqli_stmt_num_rows($stmt);
+    
+    mysqli_stmt_data_seek($stmt, 0);
+    mysqli_stmt_fetch($stmt);
+    if(!(password_verify(mysqli_real_escape_string($con,$_POST['password']), $hash)))
+        $num = 0;
 
     /* close statement */
     mysqli_stmt_close($stmt);
