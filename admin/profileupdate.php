@@ -67,7 +67,7 @@ if ( strlen($emaill) < 3 ){
 $msg=$msg."Email Must Be More Than 3 Char Length.<BR>";
 $status= "NOTOK";}
 
-if (!eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $emaill)){
+if (!preg_match("#^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$#i", $emaill)){
 $msg=$msg."Email Id Not Valid, Please Enter The Correct Email Id. This id will be used in case of recovering of password<BR>";
 $status= "NOTOK";}	
 
