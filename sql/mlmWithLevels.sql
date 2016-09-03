@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 03, 2016 at 09:44 PM
+-- Generation Time: Sep 03, 2016 at 09:49 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.23
 
@@ -26,6 +26,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `affiliateuser`
 --
 
+DROP TABLE IF EXISTS `affiliateuser`;
 CREATE TABLE `affiliateuser` (
   `Id` int(11) NOT NULL,
   `username` varchar(15) NOT NULL,
@@ -86,6 +87,7 @@ INSERT INTO `affiliateuser` (`Id`, `username`, `password`, `fname`, `address`, `
 -- Table structure for table `banners`
 --
 
+DROP TABLE IF EXISTS `banners`;
 CREATE TABLE `banners` (
   `bannerid` double NOT NULL,
   `bannerdesc` varchar(100) NOT NULL,
@@ -99,6 +101,7 @@ CREATE TABLE `banners` (
 -- Table structure for table `currency`
 --
 
+DROP TABLE IF EXISTS `currency`;
 CREATE TABLE `currency` (
   `id` int(11) NOT NULL,
   `name` text NOT NULL,
@@ -143,6 +146,7 @@ INSERT INTO `currency` (`id`, `name`, `code`, `comment`) VALUES
 -- Table structure for table `emailtext`
 --
 
+DROP TABLE IF EXISTS `emailtext`;
 CREATE TABLE `emailtext` (
   `id` int(6) NOT NULL,
   `code` varchar(50) NOT NULL,
@@ -171,6 +175,7 @@ INSERT INTO `emailtext` (`id`, `code`, `etext`, `emailactive`) VALUES
 -- Table structure for table `levellimits`
 --
 
+DROP TABLE IF EXISTS `levellimits`;
 CREATE TABLE `levellimits` (
   `level` int(11) NOT NULL,
   `limit` int(11) NOT NULL
@@ -195,6 +200,7 @@ INSERT INTO `levellimits` (`level`, `limit`) VALUES
 -- Table structure for table `notifications`
 --
 
+DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE `notifications` (
   `id` int(11) NOT NULL,
   `subject` text NOT NULL,
@@ -209,6 +215,7 @@ CREATE TABLE `notifications` (
 -- Table structure for table `packages`
 --
 
+DROP TABLE IF EXISTS `packages`;
 CREATE TABLE `packages` (
   `id` int(11) NOT NULL,
   `name` text NOT NULL,
@@ -257,6 +264,7 @@ INSERT INTO `packages` (`id`, `name`, `price`, `currency`, `details`, `tax`, `mp
 -- Table structure for table `paymentgateway`
 --
 
+DROP TABLE IF EXISTS `paymentgateway`;
 CREATE TABLE `paymentgateway` (
   `id` int(11) NOT NULL,
   `Name` text NOT NULL,
@@ -281,6 +289,7 @@ INSERT INTO `paymentgateway` (`id`, `Name`, `status`, `comment`, `date`) VALUES
 -- Table structure for table `payments`
 --
 
+DROP TABLE IF EXISTS `payments`;
 CREATE TABLE `payments` (
   `id` int(6) NOT NULL,
   `userid` varchar(50) NOT NULL,
@@ -296,6 +305,7 @@ CREATE TABLE `payments` (
 -- Table structure for table `payments_balance`
 --
 
+DROP TABLE IF EXISTS `payments_balance`;
 CREATE TABLE `payments_balance` (
   `Id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
@@ -321,6 +331,7 @@ INSERT INTO `payments_balance` (`Id`, `userid`, `sourceid`, `h_number`, `side`, 
 -- Table structure for table `paypalpayments`
 --
 
+DROP TABLE IF EXISTS `paypalpayments`;
 CREATE TABLE `paypalpayments` (
   `id` int(11) NOT NULL,
   `orderid` int(11) NOT NULL,
@@ -361,6 +372,7 @@ INSERT INTO `paypalpayments` (`id`, `orderid`, `transacid`, `price`, `currency`,
 -- Table structure for table `settings`
 --
 
+DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `email` varchar(100) NOT NULL DEFAULT 'Enter Your E-Mail Address',
   `sno` int(9) NOT NULL,
@@ -394,6 +406,7 @@ INSERT INTO `settings` (`email`, `sno`, `wlink`, `invoicedetails`, `coname`, `fb
 -- Table structure for table `timeouts`
 --
 
+DROP TABLE IF EXISTS `timeouts`;
 CREATE TABLE `timeouts` (
   `nrpaydays` int(11) NOT NULL,
   `nryearstodel` int(11) NOT NULL
@@ -412,6 +425,7 @@ INSERT INTO `timeouts` (`nrpaydays`, `nryearstodel`) VALUES
 -- Table structure for table `userlevels`
 --
 
+DROP TABLE IF EXISTS `userlevels`;
 CREATE TABLE `userlevels` (
   `id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
@@ -436,6 +450,7 @@ INSERT INTO `userlevels` (`id`, `userid`, `level`, `obtained`) VALUES
 --
 -- Stand-in structure for view `usersawaitingbonuses`
 --
+DROP VIEW IF EXISTS `usersawaitingbonuses`;
 CREATE TABLE `usersawaitingbonuses` (
 `userid` int(11)
 ,`ToAccount` double
