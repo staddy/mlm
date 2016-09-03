@@ -3,7 +3,8 @@
 include_once("z_db.php");
 
 function pay_and_go_up($con_, $userid, $sourceid, $side, $h, $amount) {
-    if($amount > 0) {
+    if(($amount > 0) && ($side!="none")) {
+        echo("userid: ".$userid." source: ".$sourceid." side: ".$side." h: ".$h." amont: ".$amount);
         $query2 = "SELECT active,".$h."_active,referedby,ref_h,ref_side FROM affiliateuser where Id = '$userid'"; 
         $result2 = mysqli_query($con_,$query2);
         $row2 = mysqli_fetch_row($result2);

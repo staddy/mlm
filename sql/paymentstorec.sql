@@ -5,11 +5,11 @@ FROM payments_balance as pb
 WHERE accounted = '0' 
 # the level is not yet full	
     AND
-		(SELECT bl.nmbrpayments 
-		FROM bonuslimits as bl
-		WHERE bl.userid=pb.userid 
+		(SELECT ul.obtained 
+		FROM userlevels as ul
+		WHERE ul.userid=pb.userid 
 			AND
-			bl.level = 
+			ul.level = 
 				(SELECT afus.level
 				FROM affiliateuser as afus
 				where afus.Id = pb.sourceid)
@@ -17,7 +17,7 @@ WHERE accounted = '0'
 				(SELECT afus.level
 				FROM affiliateuser as afus
 				where afus.Id = pb.userid)
-		) < 1 # random bonus limit - to change later
+		) < 1000000 # random bonus limit - to change later
 # performed more than X(==nrpaydays) days ago
 	AND 
 		TO_DAYS(CURTIME()) - TO_DAYS(createdtime) >= 

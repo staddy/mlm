@@ -4,7 +4,7 @@ include_once("../z_db.php");
 
 // that's the format
 echo("{id-0;level-1;referedby-2}-0<br>{id-0;level-1;referedby-2}-1<br><br>");
-
+echo("connection: ");
 // kinda like enums
         const id = 0;
         const level = 1;
@@ -23,6 +23,21 @@ $fetchedres = mysqli_query($con, $sql);
 $userinfo = mysqli_fetch_all($fetchedres);
 
 print_r($userinfo);
+foreach ($userinfo as $usernode)
+{
+    echo("<br><br>");
+    echo($usernode[id]." -ID");
+    echo("<br><br>");
+    echo($usernode[level]." -level");
+    echo("<br><br>");
+    echo($usernode[referedbyname]." -referedbyname");
+    echo("<br><br>");
+    echo($usernode[referedbyid]." -referedbyid");
+    echo("<br><br>");
+    echo("DONE");
+    echo("<br><br>");
+    
+}
 echo("<br><br>");
 $processednodes = array();
 // to keep track of the processed users

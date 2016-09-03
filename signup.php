@@ -178,7 +178,24 @@ if ($status=="OK")
     $hash = password_hash($password, PASSWORD_BCRYPT); 
 $scode=rand(1111111111,9999999999); //generating random code, this will act as signup key
 mysqli_query($con, "update affiliateuser set ".$h_number."_".$ref_side."='$username' where Id='$ref_id'");  // возможны проблемы (одновременное присоединение)
-$query=mysqli_query($con,"insert into affiliateuser(username,password,fname,address,email,referedby,ref_h,ref_side,ipaddress,mobile,doj,country,signupcode,tamount,pcktaken,expiry) values('$username','$hash','$name','$address','$email','$refusername','$h_number','$ref_side','$ip','$mobile','$cur','$country','$scode','$sbonus','$package','$expiry')");
+
+// new user level (if registered without a referal - 0, if with, then referal.level+1
+$userlevel = 0;
+if(strtolower($refusername)!="none")
+{
+    $levelres = mysqli_fetch_array(mysqli_query($con, "SELECT level "
+                        . "FROM affiliateuser "
+                        . "WHERE username = '$refusername'"));
+    $userlevel= $levelres[0]+1;
+}
+
+$query=mysqli_query($con,"insert into affiliateuser(username,password,fname,address,email,"
+                            . "referedby,ref_h,ref_side,ipaddress,mobile,doj,country,"
+                            . "signupcode,tamount,pcktaken,expiry,level) "
+                            . "values('$username','$hash','$name','$address','$email',"
+                            . "'$refusername','$h_number','$ref_side','$ip','$mobile',"
+                            . "'$cur','$country','$scode','$sbonus','$package','$expiry','$userlevel')");
+
 $_SESSION['paypalidsession'] = $userid;
 // More headers
 $headers = "MIME-Version: 1.0" . "\r\n";
