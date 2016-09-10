@@ -1,6 +1,6 @@
 SELECT pb.userid, SUM(pb.payment_amount) as ToAccount
 
-FROM payments_balance as pb
+FROM balance as pb
 # not yet logged to be saved
 WHERE accounted = '0' 
 # the level is not yet full	
@@ -28,11 +28,11 @@ WHERE accounted = '0'
 GROUP BY userid 
 HAVING
     	(SELECT COUNT(*)
-         FROM payments_balance
+         FROM balance
          WHERE LOWER(side) like "l%" 
 			AND userid = pb.userid)
          =
          (SELECT COUNT(*)
-         FROM payments_balance
+         FROM balance
          WHERE LOWER(side) like "r%" 
 			AND userid = pb.userid)

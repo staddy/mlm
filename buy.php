@@ -17,7 +17,7 @@ function pay_and_go_up($con_, $userid, $sourceid, $side, $h, $amount) {
         
         if($active && $h_active) {
             $cur=date("Y-m-d");
-            $query=mysqli_query($con_,"insert into payments_balance(userid,sourceid,h_number,side,payment_amount,createdtime) values('$userid','$sourceid','$h','$side','$amount','$cur')");
+            $query=mysqli_query($con_,"insert into balance(userid,sourceid,h_number,side,payment_amount,createdtime) values('$userid','$sourceid','$h','$side','$amount','$cur')");
         }
         
         if($referedby != "none") {

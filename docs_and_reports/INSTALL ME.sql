@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `affiliateuser` (
   `h3_active` int(11) NOT NULL DEFAULT 0
 ) ENGINE=MyISAM AUTO_INCREMENT=87 DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `payments_balance` (
+CREATE TABLE IF NOT EXISTS `balance` (
   `Id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `sourceid` int(11) NOT NULL,
@@ -357,9 +357,9 @@ ALTER TABLE `affiliateuser`
   ADD UNIQUE KEY `Id` (`Id`);
 
 --
--- Indexes for table `payments_balance`
+-- Indexes for table `balance`
 --
-ALTER TABLE `payments_balance`
+ALTER TABLE `balance`
   ADD PRIMARY KEY (`Id`);
 
 --
@@ -427,9 +427,9 @@ ALTER TABLE `settings`
 ALTER TABLE `affiliateuser`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=87;
 --
--- AUTO_INCREMENT for table `payments_balancer`
+-- AUTO_INCREMENT for table `balancer`
 --
-ALTER TABLE `payments_balance`
+ALTER TABLE `balance`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=19;
 --
 -- AUTO_INCREMENT for table `banners`

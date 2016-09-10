@@ -102,7 +102,10 @@
     $inv_id = 678678;
     $inv_desc = "Товары для животных";
     $out_summ = "100.00";
+    
+    // нужно будет убрать
     $IsTest = 1;
+
     $crc = md5("$mrh_login:$out_summ:$inv_id:$mrh_pass1");
     print "<html><script language=JavaScript ".
       "src='https://auth.robokassa.ru/Merchant/PaymentForm/FormMS.js?".

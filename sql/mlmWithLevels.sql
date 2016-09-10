@@ -302,11 +302,11 @@ CREATE TABLE `payments` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `payments_balance`
+-- Table structure for table `balance`
 --
 
-DROP TABLE IF EXISTS `payments_balance`;
-CREATE TABLE `payments_balance` (
+DROP TABLE IF EXISTS `balance`;
+CREATE TABLE `balance` (
   `Id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `sourceid` int(11) NOT NULL,
@@ -318,10 +318,10 @@ CREATE TABLE `payments_balance` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `payments_balance`
+-- Dumping data for table `balance`
 --
 
-INSERT INTO `payments_balance` (`Id`, `userid`, `sourceid`, `h_number`, `side`, `payment_amount`, `accounted`, `createdtime`) VALUES
+INSERT INTO `balance` (`Id`, `userid`, `sourceid`, `h_number`, `side`, `payment_amount`, `accounted`, `createdtime`) VALUES
 (1, 85, 89, 'h1', 'right', 120, 0, '2016-09-03 00:00:00'),
 (2, 85, 86, 'h1', 'left', 120, 0, '2016-09-03 00:00:00');
 
@@ -463,7 +463,7 @@ CREATE TABLE `usersawaitingbonuses` (
 --
 DROP TABLE IF EXISTS `usersawaitingbonuses`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `usersawaitingbonuses`  AS  select `pb`.`userid` AS `userid`,sum(`pb`.`payment_amount`) AS `ToAccount` from `payments_balance` `pb` where ((`pb`.`accounted` = '0') and ((select `ul`.`obtained` from `userlevels` `ul` where ((`ul`.`userid` = `pb`.`userid`) and (`ul`.`level` = ((select `afus`.`level` from `affiliateuser` `afus` where (`afus`.`Id` = `pb`.`sourceid`)) - (select `afus`.`level` from `affiliateuser` `afus` where (`afus`.`Id` = `pb`.`userid`)))))) < 1000000) and ((to_days(curtime()) - to_days(`pb`.`createdtime`)) >= (select `timeouts`.`nrpaydays` from `timeouts`))) group by `pb`.`userid` having ((select count(0) from `payments_balance` where ((lcase(`payments_balance`.`side`) like 'l%') and (`payments_balance`.`userid` = `pb`.`userid`))) = (select count(0) from `payments_balance` where ((lcase(`payments_balance`.`side`) like 'r%') and (`payments_balance`.`userid` = `pb`.`userid`)))) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `usersawaitingbonuses`  AS  select `pb`.`userid` AS `userid`,sum(`pb`.`payment_amount`) AS `ToAccount` from `balance` `pb` where ((`pb`.`accounted` = '0') and ((select `ul`.`obtained` from `userlevels` `ul` where ((`ul`.`userid` = `pb`.`userid`) and (`ul`.`level` = ((select `afus`.`level` from `affiliateuser` `afus` where (`afus`.`Id` = `pb`.`sourceid`)) - (select `afus`.`level` from `affiliateuser` `afus` where (`afus`.`Id` = `pb`.`userid`)))))) < 1000000) and ((to_days(curtime()) - to_days(`pb`.`createdtime`)) >= (select `timeouts`.`nrpaydays` from `timeouts`))) group by `pb`.`userid` having ((select count(0) from `balance` where ((lcase(`balance`.`side`) like 'l%') and (`balance`.`userid` = `pb`.`userid`))) = (select count(0) from `balance` where ((lcase(`balance`.`side`) like 'r%') and (`balance`.`userid` = `pb`.`userid`)))) ;
 
 --
 -- Indexes for dumped tables
@@ -526,9 +526,9 @@ ALTER TABLE `payments`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `payments_balance`
+-- Indexes for table `balance`
 --
-ALTER TABLE `payments_balance`
+ALTER TABLE `balance`
   ADD PRIMARY KEY (`Id`);
 
 --
@@ -596,9 +596,9 @@ ALTER TABLE `paymentgateway`
 ALTER TABLE `payments`
   MODIFY `id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 --
--- AUTO_INCREMENT for table `payments_balance`
+-- AUTO_INCREMENT for table `balance`
 --
-ALTER TABLE `payments_balance`
+ALTER TABLE `balance`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `paypalpayments`

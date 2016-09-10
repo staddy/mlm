@@ -49,8 +49,8 @@ $rec2111=mysqli_query($con,$sqlquery111);
 $row2111 = mysqli_fetch_row($rec2111);
 $emailtext=$row2111[0]; //assigning email text for email
 
-
-$re = mysqli_query($con,"update affiliateuser set password = '$newpassword' where email = '$email'");
+$hash = password_hash($newpassword, PASSWORD_BCRYPT);
+$re = mysqli_query($con,"update affiliateuser set password = '$hash' where email = '$email'");
 if($re)
 {
 
