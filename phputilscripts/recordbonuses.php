@@ -18,6 +18,7 @@ function getBalanceArray($id) {
             . "where af.Id = pb.userid)) as bonuslevel " //difference between the user levels
             . "FROM payments_balance pb "
             . "WHERE userid = '$id' AND "
+            . "accounted = 0 AND "
             . "TO_DAYS(CURTIME()) - TO_DAYS(createdtime) >=" //the correct time
             . "(SELECT nrpaydays "
             . "FROM timeouts) "
@@ -27,41 +28,38 @@ function getBalanceArray($id) {
     $result = mysqli_query($GLOBALS['con'], $query);
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
+// user levels retrieval from db
+/*
+  function getLevelLimits($id) {
+  /*
+  SELECT *
+  FROM levellimits ll join userlevels ul
+  on ll.level = ul.level
+  WHERE ul.userid = '85';
+  /
+  $query = "SELECT ll.level, ll.limit, ul.userid, ul.obtained "
+  . "FROM levellimits ll left outer join userlevels ul "
+  . "on ll.level = ul.level "
+  . "WHERE ul.userid = '".$id."'; ";
+  echo($query);
+  $result = mysqli_query($GLOBALS['con'], $query);
+  return mysqli_fetch_all($result, MYSQLI_ASSOC);
+  }
+ */
 
-function getLevelLimits($id) {
-    /*
-      SELECT *
-      FROM levellimits ll join userlevels ul
-      on ll.level = ul.level
-      WHERE ul.userid = '85';
-     */
-    $query = "SELECT ll.level, ll.limit, ul.userid, ul.obtained "
-            . "FROM levellimits ll left outer join userlevels ul "
-            . "on ll.level = ul.level "
-            . "WHERE ul.userid = '".$id."'; ";
-    echo($query);
-    $result = mysqli_query($GLOBALS['con'], $query);
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
-
-function getObtainedAtLevel($id,$level)
-{
+function getObtainedAtLevel($id, $level) {
     $query = "SELECT id, userid, level, obtained "
             . "FROM userlevels "
-            . "WHERE userid = '".$id."' "
-            . "AND level = ".$level."; ";
+            . "WHERE userid = '" . $id . "' "
+            . "AND level = " . $level . "; ";
     //echo($query);
     $result = mysqli_query($GLOBALS['con'], $query);
-    if($result->num_rows != 0)
-    {
+    if ($result->num_rows != 0) {
         return mysqli_fetch_row($result);
-    }
-    else
-    {
+    } else {
         return -1;
     }
 }
-
 
 $user_levels = array();
 $user_topups = array();
@@ -71,7 +69,7 @@ $userid = 0;
 if (isset($_GET['id'])) {
     $userid = $_GET['id'];
     $user_topups = getBalanceArray($userid);
-    $user_levels = getLevelLimits($userid);
+    //$user_levels = getLevelLimits($userid);
     echo("<br/>kekek<br/>");
     print_r($user_topups);
     echo("<br/>ekekek<br/>");
@@ -93,41 +91,55 @@ if (isset($user_topups)) {
                 print_r($user_topups[$i]);
                 $pairlevel = $user_topups[$oldestID]['bonuslevel'];
                 $balanceToRec = $user_topups[$oldestID]['payment_amount'] + $user_topups[$i]['payment_amount'];
-                echo("<br/>".$balanceToRec);
-                
+                echo("<br/>" . $balanceToRec);
+
                 $userLimitOnLevel = getObtainedAtLevel($userid, $pairlevel);
                 echo("<br/>");
                 print_r($userLimitOnLevel);
-                
+
                 $pairlimit = 0;
-                if($pairlevel<7)
-                {
-                    $pairlimit = pow(2,($pairlevel-1))*1000;
-                }else
-                {
-                    $pairlimit= 50000; //static stuff for levels 7 and above
+                if ($pairlevel < 7) {
+                    $pairlimit = pow(2, ($pairlevel - 1)) * 1000;
+                } else {
+                    $pairlimit = 50000; //static stuff for levels 7 and above
                 }
-                
-                
-                if($userLimitOnLevel!=-1)
-                {
+
+
+                if ($userLimitOnLevel != -1) {
                     $balanceToRec += $userLimitOnLevel[3]; //3rd element is the obtained number
-                    if($balanceToRec>$pairlimit)
-                    {
+                    if ($balanceToRec > $pairlimit) {
                         $balanceToRec = $pairlimit;
                     }
-                    $stmnt = "UPDATE USERLEVELS SET OBTAINED = ".$balanceToRec." "
-                            . "WHERE ID = ".$userLimitOnLevel[0];
-                    echo("<br/>".$stmnt." limit:".$pairlimit);
-                }else
-                {
-                    if($balanceToRec>$pairlimit)
-                    {
+
+
+
+                    $stmnt = "UPDATE USERLEVELS SET OBTAINED = " . $balanceToRec . " "
+                            . "WHERE ID = " . $userLimitOnLevel[0];
+                    echo("<br/>" . $stmnt . " limit:" . $pairlimit);
+                    
+                    $stmntupdatebalancerecords = "UPDATE PAYMENTS_BALANCE "
+                            . "SET ACCOUNTED = 1 "
+                            . "WHERE id in (" . $user_topups[$oldestID]['id'] . ","
+                            . $user_topups[$i]['payment_amount'] . ");";
+
+                    // writing to the db, uncomment when needed
+                    //$updatepb = mysqli_query($GLOBALS['con'], $stmntupdatebalancerecords);
+                    //$insertq = mysqli_query($GLOBALS['con'], $stmnt);
+                } else {
+                    if ($balanceToRec > $pairlimit) {
                         $balanceToRec = $pairlimit;
                     }
                     $stmnt = "INSERT INTO USERLEVELS(userid, level, obtained) "
-                            . "VALUES (".$userid.",".$pairlevel.",".$balanceToRec.");";
-                    echo("<br/>".$stmnt." limit:".$pairlimit);
+                            . "VALUES (" . $userid . "," . $pairlevel . "," . $balanceToRec . ");";
+                    echo("<br/>" . $stmnt . " limit:" . $pairlimit);
+                    $stmntupdatebalancerecords = "UPDATE PAYMENTS_BALANCE "
+                            . "SET ACCOUNTED = 1 "
+                            . "WHERE id in (" . $user_topups[$oldestID]['id'] . ","
+                            . $user_topups[$i]['payment_amount'] . ");";
+                    
+                    // writing to the db, uncomment when needed
+                    //$updatepb = mysqli_query($GLOBALS['con'], $stmntupdatebalancerecords);
+                    //$insertq = mysqli_query($GLOBALS['con'], $stmnt);
                 }
             }
         }
