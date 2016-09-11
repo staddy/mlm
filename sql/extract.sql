@@ -51,14 +51,6 @@ CREATE TABLE `balance_right_b` (
   `createdtime` datetime NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `balance`
--- я очистил таблицу, и эти добавил, чтобы удовлетворить поиску в usersawaitingbonuses
---
-
---INSERT INTO `balance` (`Id`, `userid`, `sourceid`, `h_number`, `side`, `payment_amount`, `accounted`, `createdtime`) VALUES
---(1, 85, 89, 'h1', 'right', 120, 0, '2016-09-03 00:00:00'),
---(2, 85, 86, 'h1', 'left', 120, 0, '2016-09-03 00:00:00');
 
 --
 -- Table structure for table `timeouts`
