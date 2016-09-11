@@ -1,56 +1,29 @@
 --
 -- Table structure for table `balance`
 --
---
 
-DROP TABLE IF EXISTS `balance_left_a`;
+DROP TABLE IF EXISTS `balance`;
 CREATE TABLE `balance_left_a` (
   `Id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `sourceid` int(11) NOT NULL,
   `h_number` varchar(2) NOT NULL,
   `side` varchar(6) NOT NULL,
+  `type` varchar(1) NOT NULL,
   `payment_amount` double NOT NULL DEFAULT '0',
   `accounted` tinyint(1) NOT NULL,
   `createdtime` datetime NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `balance_right_a`;
-CREATE TABLE `balance_right_a` (
-  `Id` int(11) NOT NULL,
-  `userid` int(11) NOT NULL,
-  `sourceid` int(11) NOT NULL,
-  `h_number` varchar(2) NOT NULL,
-  `side` varchar(6) NOT NULL,
-  `payment_amount` double NOT NULL DEFAULT '0',
-  `accounted` tinyint(1) NOT NULL,
-  `createdtime` datetime NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+--
+-- Dumping data for table `balance`
+-- я очистил таблицу, и эти добавил, чтобы удовлетворить поиску в usersawaitingbonuses
+--
 
-DROP TABLE IF EXISTS `balance_left_b`;
-CREATE TABLE `balance_left_b` (
-  `Id` int(11) NOT NULL,
-  `userid` int(11) NOT NULL,
-  `sourceid` int(11) NOT NULL,
-  `h_number` varchar(2) NOT NULL,
-  `side` varchar(6) NOT NULL,
-  `payment_amount` double NOT NULL DEFAULT '0',
-  `accounted` tinyint(1) NOT NULL,
-  `createdtime` datetime NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-DROP TABLE IF EXISTS `balance_right_b`;
-CREATE TABLE `balance_right_b` (
-  `Id` int(11) NOT NULL,
-  `userid` int(11) NOT NULL,
-  `sourceid` int(11) NOT NULL,
-  `h_number` varchar(2) NOT NULL,
-  `side` varchar(6) NOT NULL,
-  `payment_amount` double NOT NULL DEFAULT '0',
-  `accounted` tinyint(1) NOT NULL,
-  `createdtime` datetime NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
+INSERT INTO `balance` (`Id`, `userid`, `sourceid`, `h_number`, `side`, `payment_amount`, `accounted`, `createdtime`) VALUES
+(1, 85, 89, 'h1', 'right', 'a', 120, 0, '2016-09-03 00:00:00'),
+(2, 85, 86, 'h1', 'left', 'b', 120, 0, '2016-09-03 00:00:00');
+>>>>>>> 0e446b38206bc9094e824bf360d6186314bf522c
 
 --
 -- Table structure for table `timeouts`
