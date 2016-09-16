@@ -191,9 +191,9 @@ if (isset($user_topups)) {
 
 
                     
-                    $stmnt = "UPDATE USERLEVELS SET OBTAINED = " . $balanceToSet . " "
+                    $stmnt = "SET SQL_SAFE_UPDATES = 0; UPDATE USERLEVELS SET OBTAINED = " . $balanceToSet . " "
                             . "WHERE LEVEL = '". $levelToFill."' "
-                            . "AND USERID = '".$userid."';";
+                            . "AND USERID = '".$userid."'; SET SQL_SAFE_UPDATES = 1;";
                     echo("<br/>" . $stmnt . " limit:" . $levelLimit);
 
                     $stmntupdatebalancerecords = "UPDATE PAYMENTS_BALANCE "
@@ -227,24 +227,25 @@ if (isset($user_topups)) {
                         {
                             $bAmountToSet = $balanceToRec + $theCurrentLEvelInfo[4]; //the extra B score is stored at 4th column
                             
-                            $stmnt = "UPDATE USERLEVELS SET OBTAINEDEXTRAB = " . $bAmountToSet . " "
+                            $stmnt = "SET SQL_SAFE_UPDATES = 0; UPDATE USERLEVELS SET OBTAINEDEXTRAB = " . $bAmountToSet . " "
                             . "WHERE LEVEL = '". $pairlevel."' "
                             . "AND USERID = '".$userid."';";
-                            echo("<br/>" . $stmnt . " limit:" . $levelLimit);
+                            echo("<br/>" . $stmnt);
+                            $updatepb = mysqli_query($GLOBALS['con'], $stmnt);
                         }
                     }
                     
                     
                     $stmntupdatebalancerecords = "UPDATE PAYMENTS_BALANCE "
                             . "SET ACCOUNTED = 1 "
-                            . "WHERE id in (" . $user_topups[$oldestID]['id'] . ","
+                            . "WHERE id in (" . $user_topups[$oldestID]['Id'] . ","
                             . $user_topups[$i]['payment_amount'] . ");";
                     // writing to the db, uncomment when needed
-                    //$updatepb = mysqli_query($GLOBALS['con'], $stmntupdatebalancerecords);
-                    //$insertq = mysqli_query($GLOBALS['con'], $stmnt);
+                    $updatepb = mysqli_query($GLOBALS['con'], $stmntupdatebalancerecords);
+                    
                 }
                 $transactionResult = mysqli_commit($GLOBALS['con']);
-                if($transactionResult)
+                if($transactionResult == True)
                 {
                     echo("<br/>SUCCESS!<br/>");
                 }
