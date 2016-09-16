@@ -28,6 +28,7 @@ function getBalanceArray($id) {
     $result = mysqli_query($GLOBALS['con'], $query);
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
+
 // user levels retrieval from db
 /*
   function getLevelLimits($id) {
@@ -47,8 +48,71 @@ function getBalanceArray($id) {
   }
  */
 
+// чтоб найти самый низкий левел возможный для заполнения
+function getLowestAvailableLevelsForLevel($userid, $currentLevel) {
+    /*
+      SELECT ul.level, ul.obtained
+      FROM userlevels ul
+      WHERE ul.obtained <
+      (select ll.limits
+      from levellimits ll
+      where ll.level = ul.level)
+      AND ul.userid = '86'
+      AND ul.level <= '4'
+      ORDER BY ul.level ASC;
+     */
+    $query = "SELECT ul.level, ul.obtained "
+            . "FROM userlevels ul "
+            . "WHERE ul.obtained < "
+            . "(select ll.limits "
+            . "from levellimits ll "
+            . "where ll.level = ul.level) "
+            . " AND ul.userid = '" . $userid . "' "
+            . "AND ul.level <= '" . $currentLevel . "' "
+            . "ORDER BY ul.level ASC;";
+
+    $result = mysqli_query($GLOBALS['con'], $query);
+    if ($result->num_rows != 0) {
+        return mysqli_fetch_row($result);
+    } else {
+        return -1;
+    }
+}
+
+// to get the highest occupied levels before the specified level
+// если вдруг левелы не появились с заполнением
+function getHIghestOccupiedLevelsForLevel($userid, $currentLevel) {
+    /*
+      SELECT ul.level, ul.obtained
+      FROM userlevels ul
+      WHERE ul.obtained <
+      (select ll.limits
+      from levellimits ll
+      where ll.level = ul.level)
+      AND ul.userid = '86'
+      AND ul.level <= '4'
+      ORDER BY ul.level ASC;
+     */
+    $query = "SELECT ul.level, ul.obtained "
+            . "FROM userlevels ul "
+            . "WHERE ul.obtained = "
+            . "(select ll.limits "
+            . "from levellimits ll "
+            . "where ll.level = ul.level) "
+            . " AND ul.userid = '" . $userid . "' "
+            . "AND ul.level <= '" . $currentLevel . "' "
+            . "ORDER BY ul.level DESC;";
+
+    $result = mysqli_query($GLOBALS['con'], $query);
+    if ($result->num_rows != 0) {
+        return mysqli_fetch_row($result);
+    } else {
+        return "nofilledlowerlevels";
+    }
+}
+
 function getObtainedAtLevel($id, $level) {
-    $query = "SELECT id, userid, level, obtained "
+    $query = "SELECT * "
             . "FROM userlevels "
             . "WHERE userid = '" . $id . "' "
             . "AND level = " . $level . "; ";
@@ -93,39 +157,57 @@ if (isset($user_topups)) {
                 $balanceToRec = $user_topups[$oldestID]['payment_amount'] + $user_topups[$i]['payment_amount'];
                 echo("<br/>" . $balanceToRec);
 
-                $userLimitOnLevel = getObtainedAtLevel($userid, $pairlevel);
+                $userLimitsBeforeLevel = getLowestAvailableLevelsForLevel($userid, $pairlevel);
                 echo("<br/>");
-                print_r($userLimitOnLevel);
+                print_r($userLimitsBeforeLevel);
 
-                $pairlimit = 0;
-                if ($pairlevel < 7) {
-                    $pairlimit = pow(2, ($pairlevel - 1)) * 1000;
-                } else {
-                    $pairlimit = 50000; //static stuff for levels 7 and above
-                }
+                /*
+                  $pairlimit = 0;
+                  if ($pairlevel < 7) {
+                  $pairlimit = pow(2, ($pairlevel - 1)) * 1000;
+                  } else {
+                  $pairlimit = 50000; //static stuff for levels 7 and above
+                  }
+                 */
 
-
-                if ($userLimitOnLevel != -1) {
-                    $balanceToRec += $userLimitOnLevel[3]; //3rd element is the obtained number
-                    if ($balanceToRec > $pairlimit) {
-                        $balanceToRec = $pairlimit;
-                    }
-
-
-
-                    $stmnt = "UPDATE USERLEVELS SET OBTAINED = " . $balanceToRec . " "
-                            . "WHERE ID = " . $userLimitOnLevel[0];
-                    echo("<br/>" . $stmnt . " limit:" . $pairlimit);
+                if ($userLimitsBeforeLevel != -1) {
                     
+                    // для безопасности
+                    mysqli_begin_transaction($GLOBALS['con']);
+                    
+                    // if found some available levels before the specified level
+                    $levelToFill = $userLimitsBeforeLevel[0];
+                    $balanceToSet = $userLimitsBeforeLevel[1] + $balanceToRec;
+                    if ($levelToFill < 7) {
+                        $levelLimit = pow(2, ($levelToFill - 1)) * 1000;
+                    } else {
+                        $levelLimit = 50000;
+                    }
+                    if ($balanceToSet > $levelLimit) {
+                        // if balance to record exceeds the limit
+                        $balanceToSet = $levelLimit;
+                    }
+                    // else everything is fine
+
+
+                    
+                    $stmnt = "UPDATE USERLEVELS SET OBTAINED = " . $balanceToSet . " "
+                            . "WHERE LEVEL = '". $levelToFill."' "
+                            . "AND USERID = '".$userid."';";
+                    echo("<br/>" . $stmnt . " limit:" . $levelLimit);
+
                     $stmntupdatebalancerecords = "UPDATE PAYMENTS_BALANCE "
                             . "SET ACCOUNTED = 1 "
-                            . "WHERE id in (" . $user_topups[$oldestID]['id'] . ","
+                            . "WHERE id in (" . $user_topups[$oldestID]['Id'] . ","
                             . $user_topups[$i]['payment_amount'] . ");";
 
                     // writing to the db, uncomment when needed
-                    //$updatepb = mysqli_query($GLOBALS['con'], $stmntupdatebalancerecords);
-                    //$insertq = mysqli_query($GLOBALS['con'], $stmnt);
+                    $updatepb = mysqli_query($GLOBALS['con'], $stmntupdatebalancerecords);
+                    $insertq = mysqli_query($GLOBALS['con'], $stmnt);
+                    
                 } else {
+                    /* no available levels were found
+                     
                     if ($balanceToRec > $pairlimit) {
                         $balanceToRec = $pairlimit;
                     }
@@ -136,10 +218,39 @@ if (isset($user_topups)) {
                             . "SET ACCOUNTED = 1 "
                             . "WHERE id in (" . $user_topups[$oldestID]['id'] . ","
                             . $user_topups[$i]['payment_amount'] . ");";
+                    */
+                    // but if there's at least b
+                    if($user_topups[$i]['scoretype'] == 'b')
+                    {
+                        $theCurrentLEvelInfo = getObtainedAtLevel($userid, $pairlevel);
+                        if($theCurrentLEvelInfo != -1)
+                        {
+                            $bAmountToSet = $balanceToRec + $theCurrentLEvelInfo[4]; //the extra B score is stored at 4th column
+                            
+                            $stmnt = "UPDATE USERLEVELS SET OBTAINEDEXTRAB = " . $bAmountToSet . " "
+                            . "WHERE LEVEL = '". $pairlevel."' "
+                            . "AND USERID = '".$userid."';";
+                            echo("<br/>" . $stmnt . " limit:" . $levelLimit);
+                        }
+                    }
                     
+                    
+                    $stmntupdatebalancerecords = "UPDATE PAYMENTS_BALANCE "
+                            . "SET ACCOUNTED = 1 "
+                            . "WHERE id in (" . $user_topups[$oldestID]['id'] . ","
+                            . $user_topups[$i]['payment_amount'] . ");";
                     // writing to the db, uncomment when needed
                     //$updatepb = mysqli_query($GLOBALS['con'], $stmntupdatebalancerecords);
                     //$insertq = mysqli_query($GLOBALS['con'], $stmnt);
+                }
+                $transactionResult = mysqli_commit($GLOBALS['con']);
+                if($transactionResult)
+                {
+                    echo("<br/>SUCCESS!<br/>");
+                }
+                else
+                {
+                    echo("<br/>FUCKIT!<br/>");
                 }
             }
         }
